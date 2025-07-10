@@ -1,0 +1,9 @@
+{
+  "/_app": "pages/_app.js",
+  "/_error": "pages/_error.js",
+  "/_document": "pages/_document.js",
+  "/secret-santa": "pages/secret-santa.js",
+  "/": "pages/index.js",
+  "/api/secret-santa/auth": "pages/api/secret-santa/auth.js",
+  "/api/secret-santa/data": "pages/api/secret-santa/data.js"
+}
