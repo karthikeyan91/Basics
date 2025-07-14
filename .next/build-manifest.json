@@ -27,10 +27,15 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/secret-santa": [
+    "/budget-tracker": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/secret-santa.js"
+      "static/chunks/pages/budget-tracker.js"
+    ],
+    "/price-comparison": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/price-comparison.js"
     ]
   },
   "ampFirstPages": []

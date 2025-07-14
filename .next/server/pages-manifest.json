@@ -1,9 +1,9 @@
 {
   "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
+  "/_error": "pages/_error.js",
+  "/price-comparison": "pages/price-comparison.js",
+  "/budget-tracker": "pages/budget-tracker.js",
   "/secret-santa": "pages/secret-santa.js",
-  "/": "pages/index.js",
-  "/api/secret-santa/auth": "pages/api/secret-santa/auth.js",
-  "/api/secret-santa/data": "pages/api/secret-santa/data.js"
+  "/": "pages/index.js"
 }
