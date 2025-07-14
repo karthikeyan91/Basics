@@ -861,7 +861,7 @@ export default function SecretSanta() {
               Budget Tracker
             </Link>
             <Link href="/secret-santa" className={styles.navLink}>
-              Secret Santa
+              Secret Swap
             </Link>
           </div>
           <div className={styles.themeToggle}>
