@@ -3,6 +3,12 @@ import Link from 'next/link';
 import { useContext, useState, useEffect } from 'react';
 import styles from '../styles/Home.module.css';
 import { ThemeContext } from './_app';
+import { createClient } from '@supabase/supabase-js';
+
+// Supabase setup
+const supabaseUrl = 'https://djahzbhodzebtoinjwo.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqYWh6YmhvZHplYnRvaXduandvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NzA1MTIsImV4cCI6MjA2ODE0NjUxMn0.3IjHZ82RWj6Bwl_tib-pa2ZoWAF3paXiobPJqzTDDc4';
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function SecretSanta() {
   const { theme, toggleTheme } = useContext(ThemeContext);
@@ -133,6 +139,7 @@ export default function SecretSanta() {
       });
 
       const data = await response.json();
+      console.log('Signup response:', response, 'Data:', data); // <-- Add this line
 
       if (response.ok) {
         localStorage.setItem('secretSantaToken', data.token);
@@ -241,7 +248,7 @@ export default function SecretSanta() {
       if (response.ok) {
         const allUsers = await response.json();
         // Filter users to only include participants in the selected event
-        const eventParticipants = allUsers.filter(u => 
+        const eventParticipants = allUsers.filter(u =>
           selectedEvent.participants.includes(u.id)
         );
         setParticipants(eventParticipants);
@@ -865,7 +872,7 @@ export default function SecretSanta() {
             </Link>
           </div>
           <div className={styles.themeToggle}>
-            <button 
+            <button
               className={styles.themeButton}
               onClick={toggleTheme}
               aria-label="Toggle theme"

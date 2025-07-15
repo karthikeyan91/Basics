@@ -1,21 +1,4 @@
-import fs from 'fs';
-import path from 'path';
-
-// Path to our data file
-const dataFilePath = path.join(process.cwd(), 'data', 'secret-santa.json');
-
-// Read data from file
-function readData() {
-  try {
-    if (!fs.existsSync(dataFilePath)) {
-      return { users: [], events: [], assignments: [] };
-    }
-    return JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
-  } catch (error) {
-    console.error('Error reading data file:', error);
-    return { users: [], events: [], assignments: [] };
-  }
-}
+import supabase from '../../../lib/supabase';
 
 export default async function handler(req, res) {
   // Only allow POST requests
@@ -24,7 +7,6 @@ export default async function handler(req, res) {
   }
 
   const { action } = req.query;
-  const data = readData();
 
   if (!action) {
     return res.status(400).json({ error: 'Action parameter is required' });
@@ -32,51 +14,60 @@ export default async function handler(req, res) {
 
   // Handle signup
   if (action === 'signup') {
-    const { username, password } = req.body;
+    const { username, password, role = 'participant' } = req.body;
 
     if (!username || !password) {
       return res.status(400).json({ error: 'Username and password are required' });
     }
 
-    // Check if username already exists
-    if (data.users.some(u => u.username === username)) {
-      return res.status(409).json({ error: 'Username already exists' });
-    }
-
-    // Create new user
-    const newUser = {
-      id: Date.now().toString(),
-      username,
-      password, // In a real app, this should be hashed
-      role: 'participant' // Default to participant role
-    };
-
-    // Add user to data file (using the data API)
     try {
-      const response = await fetch(`${req.headers.origin}/api/secret-santa/data?type=users`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newUser),
-      });
+      // Check if username already exists
+      const { data: existingUsers, error: checkError } = await supabase
+        .from('signup')
+        .select('username')
+        .eq('username', username)
+        .limit(1);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        return res.status(response.status).json(errorData);
+      if (checkError) {
+        console.error('Error checking existing user:', checkError);
+        return res.status(500).json({ error: 'Failed to check existing user' });
       }
 
-      const userData = await response.json();
+      if (existingUsers && existingUsers.length > 0) {
+        return res.status(409).json({ error: 'Username already exists' });
+      }
 
-      // Create a session token (in a real app, use a proper JWT or session mechanism)
+      // Create new user in Supabase
+      const { data: newUser, error: createError } = await supabase
+        .from('signup')
+        .insert([
+          {
+            username,
+            password, // In a real app, this should be hashed
+            role
+          }
+        ])
+        .select();
+
+      if (createError) {
+        console.error('Error creating user:', createError);
+        return res.status(500).json({ error: 'Failed to create user' });
+      }
+
+      const userData = newUser[0];
+
+      // Create a session token
       const sessionToken = Buffer.from(`${userData.id}:${userData.role}`).toString('base64');
 
+      // Don't return the password in the response
+      const { password: _, ...userWithoutPassword } = userData;
+
       return res.status(201).json({
-        user: userData,
+        user: userWithoutPassword,
         token: sessionToken
       });
     } catch (error) {
-      console.error('Error creating user:', error);
+      console.error('Error in signup process:', error);
       return res.status(500).json({ error: 'Failed to create user' });
     }
   }
@@ -89,28 +80,44 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Username and password are required' });
     }
 
-    // Find user by username
-    const user = data.users.find(u => u.username === username);
+    try {
+      // Find user by username
+      const { data: users, error: findError } = await supabase
+        .from('signup')
+        .select('*')
+        .eq('username', username)
+        .limit(1);
 
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid username or password' });
+      if (findError) {
+        console.error('Error finding user:', findError);
+        return res.status(500).json({ error: 'Failed to find user' });
+      }
+
+      if (!users || users.length === 0) {
+        return res.status(401).json({ error: 'Invalid username or password' });
+      }
+
+      const user = users[0];
+
+      // Check password (in a real app, use proper password hashing)
+      if (user.password !== password) {
+        return res.status(401).json({ error: 'Invalid username or password' });
+      }
+
+      // Create a session token
+      const sessionToken = Buffer.from(`${user.id}:${user.role}`).toString('base64');
+
+      // Don't return the password in the response
+      const { password: _, ...userWithoutPassword } = user;
+
+      return res.status(200).json({
+        user: userWithoutPassword,
+        token: sessionToken
+      });
+    } catch (error) {
+      console.error('Error in login process:', error);
+      return res.status(500).json({ error: 'Failed to login' });
     }
-
-    // Check password (in a real app, use proper password hashing)
-    if (user.password !== password) {
-      return res.status(401).json({ error: 'Invalid username or password' });
-    }
-
-    // Create a session token (in a real app, use a proper JWT or session mechanism)
-    const sessionToken = Buffer.from(`${user.id}:${user.role}`).toString('base64');
-
-    // Don't return the password in the response
-    const { password: _, ...userWithoutPassword } = user;
-
-    return res.status(200).json({
-      user: userWithoutPassword,
-      token: sessionToken
-    });
   }
 
   // Handle verify token
@@ -122,19 +129,28 @@ export default async function handler(req, res) {
     }
 
     try {
-      // Decode token (in a real app, use proper JWT verification)
+      // Decode token
       const decoded = Buffer.from(token, 'base64').toString('utf-8');
       const [userId, role] = decoded.split(':');
 
       // Find user by ID
-      const user = data.users.find(u => u.id === userId);
+      const { data: user, error: findError } = await supabase
+        .from('signup')
+        .select('*')
+        .eq('id', userId)
+        .limit(1);
 
-      if (!user) {
+      if (findError) {
+        console.error('Error finding user:', findError);
+        return res.status(500).json({ error: 'Failed to verify token' });
+      }
+
+      if (!user || user.length === 0) {
         return res.status(401).json({ error: 'Invalid token' });
       }
 
       // Don't return the password in the response
-      const { password, ...userWithoutPassword } = user;
+      const { password, ...userWithoutPassword } = user[0];
 
       return res.status(200).json({
         user: userWithoutPassword,
@@ -146,8 +162,9 @@ export default async function handler(req, res) {
     }
   }
 
-  // Handle logout (client-side only in this implementation)
+  // Handle logout
   if (action === 'logout') {
+    // With Supabase, we could invalidate the session, but for now we'll keep it simple
     return res.status(200).json({ message: 'Logged out successfully' });
   }
 

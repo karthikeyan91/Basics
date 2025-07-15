@@ -7,7 +7,7 @@
   top: 0;
   z-index: 100;
   border-bottom: 1px solid var(--border-color);
-  padding: 1.5rem 0;
+  padding: 0.3rem 0;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   transition: all var(--transition-speed) ease;
 }
@@ -29,14 +29,17 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  margin-bottom: -5.3rem;
 }
 
 .navLink {
+  border: 1px solid var(--border-color);
   color: var(--text-color);
+  background-color: var(--header-background);
   font-weight: 500;
   text-decoration: none;
   padding: 0.5rem 0.8rem;
-  border-radius: 4px;
+  border-radius: 10px;
   transition: all var(--transition-speed) ease;
   position: relative;
 }
@@ -46,20 +49,6 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.navLink:after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent-color), var(--button-background));
-  transition: width var(--transition-speed) ease;
-}
-
-.navLink:hover:after {
-  width: 100%;
-}
 
 .logo {
   font-family: var(--heading-font);
@@ -72,7 +61,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  margin-bottom: -4rem;
+  margin-bottom: -3.5rem;
 }
 
 @keyframes steam {
@@ -85,6 +74,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: -5.3rem;
 }
 
 .themeButton {
