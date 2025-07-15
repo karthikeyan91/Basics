@@ -93,7 +93,7 @@ export default function Home({ feeds }) {
             </Link>
           </div>
           <div className={styles.themeToggle}>
-            <button 
+            <button
               className={styles.themeButton}
               onClick={toggleTheme}
               aria-label="Toggle theme"
@@ -109,10 +109,11 @@ export default function Home({ feeds }) {
         <Head>
           <title>Basics</title>
           <meta name="description" content="Your daily Basics + news and updates" />
-          <link rel="icon" href="/favicon.ico" />
-          <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
           <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
           <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+          <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+          <link rel="manifest" href="/site.webmanifest" />
+          <link rel="shortcut icon" href="/favicon.ico" />
           <meta name="theme-color" content="#4caf50" />
         </Head>
 
@@ -129,7 +130,7 @@ export default function Home({ feeds }) {
         </main>
       </div>
 
-      <button 
+      <button
         className={`${styles.refreshButton} ${refreshing ? styles.refreshing : ''}`}
         onClick={handleRefresh}
         aria-label="Refresh feeds"

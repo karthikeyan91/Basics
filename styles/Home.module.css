@@ -63,7 +63,7 @@
 
 .logo {
   font-family: var(--heading-font);
-  font-size: 1.8rem;
+  font-size: 6rem;
   font-weight: 700;
   position: relative;
   padding-left: 2.2rem;
@@ -72,6 +72,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  margin-bottom: -4rem;
 }
 
 @keyframes steam {
@@ -397,21 +398,21 @@
 }
 
 .budgetContainer {
-  width: 99vw;
+  width: 100%;
   max-height: 400px;
   overflow: auto;
   min-width: 300px;
   margin-bottom: 0.5rem;
   border-top: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
-  padding: 1rem;
+  padding: 3rem 1rem;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   transition: all var(--transition-speed) cubic-bezier(0.25, 0.8, 0.25, 1);
   background-color: var(--background-color);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   position: sticky;
-  top: 97px;
+  top: 140px;
   z-index: 100;
   margin-left: calc(-50vw + 50%);
   margin-right: calc(-50vw + 50%);
@@ -420,6 +421,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  border-radius: 8px;
 }
 
 .budgetContainer > * {
